@@ -26,11 +26,11 @@ export default function ProfileSimplePage({ onClose }: ProfileSimplePageProps) {
         <div className="rounded-2xl bg-card p-5 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <span className="text-2xl font-bold text-primary">小</span>
+              <span className="text-2xl font-bold text-primary">晓</span>
             </div>
             <div className="flex-1">
-              <h2 className="text-lg font-bold text-foreground">小明</h2>
-              <p className="mt-0.5 text-sm text-muted-foreground">138****8888</p>
+              <h2 className="text-lg font-bold text-foreground">晓东</h2>
+              <p className="mt-0.5 text-sm text-muted-foreground">178****6465</p>
             </div>
             <ChevronRight className="h-5 w-5 text-muted-foreground" />
           </div>
@@ -63,7 +63,7 @@ export default function ProfileSimplePage({ onClose }: ProfileSimplePageProps) {
         <div className="mt-4 rounded-2xl bg-card p-4 shadow-sm">
           <p className="text-sm font-medium text-foreground">联系我们</p>
           <p className="mt-2 text-xs text-muted-foreground">
-            如有任何问题或建议，请联系：support@fukang.com
+            如有任何问题或建议，请联系：1552614119@qq.com
           </p>
         </div>
       </div>
