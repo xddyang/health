@@ -227,11 +227,13 @@ export default function SkinTestPage({ onClose, onNavigateToAI }: SkinTestPagePr
   }
 
   const progress = ((currentQuestion + 1) / questions.length) * 100
-  const currentQ = questions[currentQuestion]
-
-  if (!currentQ) {
+  
+  // Safe access to current question with fallback
+  if (currentQuestion < 0 || currentQuestion >= questions.length) {
     return null
   }
+  
+  const currentQ = questions[currentQuestion]
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-background">
