@@ -115,7 +115,7 @@ const allArticles = [
 
 interface SearchPageProps {
   onClose: () => void
-  onSelectArticle: (article: typeof allArticles[0]) => void
+  onSelectArticle: (article: (typeof allArticles)[0]) => void
 }
 
 const hotSearches = [
