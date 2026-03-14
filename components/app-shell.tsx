@@ -48,8 +48,8 @@ export default function AppShell() {
         <CameraPage onClose={() => setShowCamera(false)} />
       )}
 
-      {/* Tab Bar - MVP: 3 tabs, 二级页面时隐藏 */}
-      {!hideTabBar && (
+      {/* Tab Bar - MVP: 3 tabs, 二级页面或相机页面时隐藏 */}
+      {!hideTabBar && !showCamera && (
       <nav className="relative z-50 flex shrink-0 items-end justify-around border-t border-border bg-card px-2 pb-6 pt-2">
         {tabs.map((tab) => {
           const Icon = tab.icon
