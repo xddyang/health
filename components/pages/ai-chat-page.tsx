@@ -1,15 +1,10 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Send, Bot, User, Sparkles, Stethoscope, PlusCircle, History } from "lucide-react"
-import ChatHistoryPage from "./chat-history-page"
-
-interface Message {
-  id: number
-  role: "user" | "ai"
-  content: string
-  time: string
-}
+import { Send, Bot, User, Sparkles, Stethoscope, PlusCircle, History, ImagePlus, Camera, Upload, X } from "lucide-react"
+import Image from "next/image"
+import ChatHistoryPage, { type ChatSession, type Message } from "./chat-history-page"
+import CameraPage from "./camera-page"
 
 const suggestedQuestions = [
   "脸上长痘痘怎么处理？",
@@ -28,11 +23,36 @@ const initialMessages: Message[] = [
   },
 ]
 
-export default function AiChatPage() {
+interface AiChatPageProps {
+  onSubPageChange?: (isSubPage: boolean) => void
+  pendingImage?: string | null
+  onPendingImageUsed?: () => void
+}
+
+export default function AiChatPage({ onSubPageChange, pendingImage, onPendingImageUsed }: AiChatPageProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [inputValue, setInputValue] = useState("")
   const [showHistory, setShowHistory] = useState(false)
+  const [showImageMenu, setShowImageMenu] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [showCamera, setShowCamera] = useState(false)
+  const [savedSessions, setSavedSessions] = useState<ChatSession[]>([])
+  const [currentSessionId, setCurrentSessionId] = useState<number | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 通知父组件是否在二级页面
+  useEffect(() => {
+    onSubPageChange?.(showHistory || showCamera)
+  }, [showHistory, showCamera, onSubPageChange])
+
+  // 接收从分析结果页带过来的图片
+  useEffect(() => {
+    if (pendingImage) {
+      setSelectedImage(pendingImage)
+      onPendingImageUsed?.()
+    }
+  }, [pendingImage, onPendingImageUsed])
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -41,62 +61,97 @@ export default function AiChatPage() {
   }, [messages])
 
   const handleSend = () => {
-    if (!inputValue.trim()) return
+    if (!inputValue.trim() && !selectedImage) return
 
     const userMsg: Message = {
       id: Date.now(),
       role: "user",
-      content: inputValue,
+      content: inputValue || (selectedImage ? "请帮我分析这张图片" : ""),
       time: new Date().toLocaleTimeString("zh-CN", {
         hour: "2-digit",
         minute: "2-digit",
       }),
+      image: selectedImage || undefined,
     }
     setMessages((prev) => [...prev, userMsg])
     setInputValue("")
+    setSelectedImage(null)
 
     // Simulate AI response
     setTimeout(() => {
       const aiMsg: Message = {
         id: Date.now() + 1,
         role: "ai",
-        content: getAiResponse(inputValue),
+        content: selectedImage ? getImageAnalysisResponse(inputValue) : getAiResponse(inputValue),
         time: new Date().toLocaleTimeString("zh-CN", {
           hour: "2-digit",
           minute: "2-digit",
         }),
       }
       setMessages((prev) => [...prev, aiMsg])
-    }, 1000)
+    }, 1500)
+  }
+
+  // 处理图片选择
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+    setShowImageMenu(false)
   }
 
   const handleQuickQuestion = (question: string) => {
     setInputValue(question)
   }
 
-  const handleSelectChat = (chatId: number) => {
-    // Load chat history based on chatId
-    const mockHistoryMessages: Message[] = [
-      {
-        id: 1,
-        role: "ai",
-        content: "您好！我是肤康AI助手。请问有什么可以帮助您的？",
-        time: "10:00",
-      },
-      {
-        id: 2,
-        role: "user",
-        content: "我脸上最近长了一些痘痘，应该怎么处理？",
-        time: "10:01",
-      },
-      {
-        id: 3,
-        role: "ai",
-        content: "根据您的描述，这可能是痤疮。建议：\n1. 保持面部清洁，使用温和洁面产品\n2. 避免用手挤压\n3. 选择含水杨酸或苯甲酰过氧化物的护肤品\n4. 如果反复发作，建议到皮肤科就诊",
-        time: "10:01",
-      },
-    ]
-    setMessages(mockHistoryMessages)
+  // 保存当前对话到历史记录
+  const saveCurrentSession = () => {
+    if (messages.length > 1) {
+      // 只有有实际对话才保存
+      const userMessages = messages.filter((m) => m.role === "user")
+      if (userMessages.length > 0) {
+        const firstUserMessage = userMessages[0].content
+        const lastAiMessage = messages.filter((m) => m.role === "ai").pop()
+        
+        const newSession: ChatSession = {
+          id: Date.now(),
+          title: firstUserMessage.slice(0, 20) + (firstUserMessage.length > 20 ? "..." : ""),
+          lastMessage: lastAiMessage?.content.slice(0, 50) + "..." || "",
+          date: "刚刚",
+          messageCount: messages.length,
+          messages: [...messages],
+        }
+        
+        // 检查是否已存在该会话（编辑现有会话）
+        if (currentSessionId) {
+          setSavedSessions((prev) =>
+            prev.map((s) => (s.id === currentSessionId ? newSession : s))
+          )
+        } else {
+          setSavedSessions((prev) => [newSession, ...prev])
+        }
+      }
+    }
+  }
+
+  // 新建对话
+  const handleNewChat = () => {
+    saveCurrentSession()
+    setMessages(initialMessages)
+    setCurrentSessionId(null)
+  }
+
+  const handleSelectChat = (chatId: number, chatMessages: Message[]) => {
+    // 先保存当前对话
+    saveCurrentSession()
+    // 加载选中的对话
+    setMessages(chatMessages)
+    setCurrentSessionId(chatId)
     setShowHistory(false)
   }
 
@@ -107,7 +162,13 @@ export default function AiChatPage() {
         <ChatHistoryPage
           onClose={() => setShowHistory(false)}
           onSelectChat={handleSelectChat}
+          savedSessions={savedSessions}
         />
+      )}
+
+      {/* Camera Page */}
+      {showCamera && (
+        <CameraPage onClose={() => setShowCamera(false)} />
       )}
 
       {/* Header */}
@@ -136,9 +197,7 @@ export default function AiChatPage() {
               <History className="h-5 w-5 text-muted-foreground" />
             </button>
             <button
-              onClick={() => {
-                setMessages(initialMessages)
-              }}
+              onClick={handleNewChat}
               className="rounded-full bg-muted p-2 transition-colors hover:bg-accent"
               aria-label="新对话"
             >
@@ -177,7 +236,19 @@ export default function AiChatPage() {
                   : "rounded-tr-sm bg-primary text-primary-foreground"
               }`}
             >
-              <p className="text-sm leading-relaxed">{msg.content}</p>
+              {/* 显示图片 */}
+              {msg.image && (
+                <div className="mb-2 overflow-hidden rounded-lg">
+                  <Image
+                    src={msg.image}
+                    alt="上传的图片"
+                    width={200}
+                    height={150}
+                    className="h-auto w-full object-cover"
+                  />
+                </div>
+              )}
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
               <span
                 className={`mt-1 block text-right text-[10px] ${
                   msg.role === "ai"
@@ -215,7 +286,72 @@ export default function AiChatPage() {
 
       {/* Input */}
       <div className="border-t border-border bg-card px-4 py-3">
+        {/* 图片预览 */}
+        {selectedImage && (
+          <div className="mb-3 relative inline-block">
+            <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-border">
+              <Image
+                src={selectedImage}
+                alt="预览图片"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 shadow-md"
+              aria-label="移除图片"
+            >
+              <X className="h-3 w-3 text-white" strokeWidth={3} />
+            </button>
+          </div>
+        )}
+        
         <div className="flex items-end gap-2">
+          {/* 图片按钮 */}
+          <div className="relative">
+            <button
+              onClick={() => setShowImageMenu(!showImageMenu)}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              aria-label="添加图片"
+            >
+              <ImagePlus className="h-5 w-5" />
+            </button>
+            
+            {/* 图片选择菜单 */}
+            {showImageMenu && (
+              <div className="absolute bottom-12 left-0 z-50 w-36 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+                <button
+                  onClick={() => {
+                    setShowImageMenu(false)
+                    setShowCamera(true)
+                  }}
+                  className="flex w-full items-center gap-2 px-4 py-3 text-sm text-foreground transition-colors hover:bg-muted"
+                >
+                  <Camera className="h-4 w-4 text-primary" />
+                  拍照
+                </button>
+                <div className="h-px bg-border" />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex w-full items-center gap-2 px-4 py-3 text-sm text-foreground transition-colors hover:bg-muted"
+                >
+                  <Upload className="h-4 w-4 text-primary" />
+                  从相册选择
+                </button>
+              </div>
+            )}
+            
+            {/* 隐藏的文件输入 - 仅用于从相册选择 */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden"
+            />
+          </div>
+          
           <div className="flex-1 rounded-2xl bg-muted px-4 py-2.5">
             <textarea
               value={inputValue}
@@ -226,14 +362,14 @@ export default function AiChatPage() {
                   handleSend()
                 }
               }}
-              placeholder="描述您的皮肤问题..."
+              placeholder={selectedImage ? "描述图片中的问题..." : "描述您的皮肤问题..."}
               rows={1}
               className="w-full resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
             />
           </div>
           <button
             onClick={handleSend}
-            disabled={!inputValue.trim()}
+            disabled={!inputValue.trim() && !selectedImage}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-all disabled:opacity-40"
             aria-label="发送"
           >
@@ -241,8 +377,27 @@ export default function AiChatPage() {
           </button>
         </div>
       </div>
+      
+      {/* 点击其他区域关闭菜单 */}
+      {showImageMenu && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setShowImageMenu(false)}
+        />
+      )}
     </div>
   )
+}
+
+// 图片分析的模拟响应
+function getImageAnalysisResponse(question: string): string {
+  if (question.includes("痘") || question.includes("痤疮")) {
+    return "根据您上传的图片分析：\n\n**初步判断**：痤疮（粉刺型）\n**严重程度**：轻度\n\n**分析结果**：\n- 图片显示有少量闭合性粉刺\n- 无明显炎症表现\n- 皮肤出油情况较明显\n\n**护理建议**：\n1. 选用温和控油洁面产品\n2. 可使用含水杨酸的护肤品\n3. 注意饮食清淡，避免辛辣油腻\n4. 保持作息规律\n\n⚠️ 本分析仅供参考，如症状持续建议就医"
+  }
+  if (question.includes("红") || question.includes("敏感")) {
+    return "根据您上传的图片分析：\n\n**初步判断**：皮肤敏感/轻微红血丝\n**严重程度**：轻度\n\n**分析结果**：\n- 面部可见轻微泛红\n- 皮肤屏障可能受损\n- 无明显皮疹或丘疹\n\n**护理建议**：\n1. 使用修复型护肤品\n2. 避免刺激性成分\n3. 加强防晒\n4. 简化护肤步骤\n\n⚠️ 本分析仅供参考，如症状持续建议就医"
+  }
+  return "根据您上传的图片分析：\n\n**初步判断**：皮肤状态需进一步观察\n\n**分析结果**：\n- 图片清晰度良好\n- 未发现明显异常病变\n- 建议继续观察\n\n**一般护理建议**：\n1. 保持皮肤清洁\n2. 做好日常保湿\n3. 注意防晒\n4. 如有不适及时就医\n\n如需更准确诊断，建议您：\n- 提供更清晰的近距离照片\n- 描述具体症状和持续时间\n- 告知是否有过敏史\n\n⚠️ 本分析仅供参考，不构成医疗建议"
 }
 
 function getAiResponse(input: string): string {
