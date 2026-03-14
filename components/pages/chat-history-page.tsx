@@ -153,9 +153,12 @@ export default function ChatHistoryPage({
           <div className="flex flex-col gap-2">
             {filteredSessions.map((session) => (
               <div key={session.id} className="relative">
-                <button
+                <div
                   onClick={() => onSelectChat(session.id)}
-                  className="flex w-full items-start gap-3 rounded-xl bg-card p-4 text-left shadow-sm transition-transform active:scale-[0.98]"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && onSelectChat(session.id)}
+                  className="flex w-full cursor-pointer items-start gap-3 rounded-xl bg-card p-4 text-left shadow-sm transition-transform active:scale-[0.98]"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
                     <MessageSquare className="h-5 w-5 text-primary" />
@@ -189,7 +192,7 @@ export default function ChatHistoryPage({
                     </div>
                   </div>
                   <ChevronRight className="mt-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                </button>
+                </div>
 
                 {/* Dropdown Menu */}
                 {activeMenu === session.id && (
