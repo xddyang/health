@@ -23,7 +23,13 @@ const initialMessages: Message[] = [
   },
 ]
 
-export default function AiChatPage() {
+interface AiChatPageProps {
+  onSubPageChange?: (isSubPage: boolean) => void
+  pendingImage?: string | null
+  onPendingImageUsed?: () => void
+}
+
+export default function AiChatPage({ onSubPageChange, pendingImage, onPendingImageUsed }: AiChatPageProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [inputValue, setInputValue] = useState("")
   const [showHistory, setShowHistory] = useState(false)
@@ -34,6 +40,19 @@ export default function AiChatPage() {
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 通知父组件是否在二级页面
+  useEffect(() => {
+    onSubPageChange?.(showHistory || showCamera)
+  }, [showHistory, showCamera, onSubPageChange])
+
+  // 接收从分析结果页带过来的图片
+  useEffect(() => {
+    if (pendingImage) {
+      setSelectedImage(pendingImage)
+      onPendingImageUsed?.()
+    }
+  }, [pendingImage, onPendingImageUsed])
 
   useEffect(() => {
     if (scrollRef.current) {

@@ -19,6 +19,10 @@ export default function AppShell() {
   const [showCamera, setShowCamera] = useState(false)
   // 控制是否显示tabbar - 二级页面时隐藏
   const [hideTabBar, setHideTabBar] = useState(false)
+  // AI问诊页是否在二级页面（相机/历史）
+  const [aiPageInSubPage, setAiPageInSubPage] = useState(false)
+  // 从分析结果页带过来的图片
+  const [pendingImageForChat, setPendingImageForChat] = useState<string | null>(null)
 
   const handleTabClick = (tabId: TabType) => {
     if (tabId === "camera") {
@@ -40,16 +44,29 @@ export default function AppShell() {
             onSubPageChange={setHideTabBar}
           />
         )}
-        {activeTab === "ai" && <AiChatPage />}
+        {activeTab === "ai" && (
+          <AiChatPage 
+            onSubPageChange={setAiPageInSubPage}
+            pendingImage={pendingImageForChat}
+            onPendingImageUsed={() => setPendingImageForChat(null)}
+          />
+        )}
       </main>
 
       {/* Camera Modal */}
       {showCamera && (
-        <CameraPage onClose={() => setShowCamera(false)} />
+        <CameraPage 
+          onClose={() => setShowCamera(false)} 
+          onConsultDoctor={(image) => {
+            setPendingImageForChat(image)
+            setShowCamera(false)
+            setActiveTab("ai")
+          }}
+        />
       )}
 
       {/* Tab Bar - MVP: 3 tabs, 二级页面或相机页面时隐藏 */}
-      {!hideTabBar && !showCamera && (
+      {!hideTabBar && !showCamera && !aiPageInSubPage && (
       <nav className="relative z-50 flex shrink-0 items-end justify-around border-t border-border bg-card px-2 pb-6 pt-2">
         {tabs.map((tab) => {
           const Icon = tab.icon

@@ -6,11 +6,8 @@ import {
   ArrowLeft,
   Share2,
   Bookmark,
-  ThumbsUp,
-  MessageCircle,
   Eye,
   Clock,
-  ChevronRight,
   BookmarkCheck,
   Heart,
 } from "lucide-react"
@@ -169,6 +166,14 @@ export default function ArticleDetailPage({
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(article.likes)
+  const [showShareSuccess, setShowShareSuccess] = useState(false)
+
+  const handleShare = () => {
+    setShowShareSuccess(true)
+    setTimeout(() => {
+      setShowShareSuccess(false)
+    }, 2000)
+  }
   
   // Reset states when article changes
   const handleArticleChange = (newArticleId: number) => {
@@ -210,6 +215,7 @@ export default function ArticleDetailPage({
             )}
           </button>
           <button
+            onClick={handleShare}
             className="rounded-full bg-muted/80 p-2 transition-colors hover:bg-muted"
             aria-label="分享"
           >
@@ -318,8 +324,8 @@ export default function ArticleDetailPage({
         </div>
       </div>
 
-      {/* Bottom Action Bar - MVP: 简化，移除咨询医生 */}
-      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-8 border-t border-border bg-card px-5 py-3 pb-6">
+      {/* Bottom Action Bar - MVP: 简化，只保留点赞和收藏 */}
+      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-12 border-t border-border bg-card px-5 py-3 pb-6">
         <button
           onClick={handleLike}
           className="flex items-center gap-1.5"
@@ -339,12 +345,6 @@ export default function ArticleDetailPage({
             {likeCount}
           </span>
         </button>
-        <button className="flex items-center gap-1.5">
-          <MessageCircle className="h-5 w-5 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">
-            {article.comments}
-          </span>
-        </button>
         <button
           onClick={() => setIsBookmarked(!isBookmarked)}
           className="flex items-center gap-1.5"
@@ -359,6 +359,20 @@ export default function ArticleDetailPage({
           </span>
         </button>
       </div>
+
+      {/* 分享成功弹窗 */}
+      {showShareSuccess && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-foreground/20">
+          <div className="rounded-xl bg-card px-6 py-4 shadow-lg">
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <Share2 className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-sm font-medium text-foreground">分享成功</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
