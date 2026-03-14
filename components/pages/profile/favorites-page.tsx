@@ -9,10 +9,10 @@ import {
   ThumbsUp,
   Trash2,
 } from "lucide-react"
+import ArticleDetailPage from "../article-detail-page"
 
 interface FavoritesPageProps {
   onClose: () => void
-  onArticleClick?: (articleId: number) => void
 }
 
 const mockFavorites = [
@@ -45,13 +45,23 @@ const mockFavorites = [
   },
 ]
 
-export default function FavoritesPage({ onClose, onArticleClick }: FavoritesPageProps) {
+export default function FavoritesPage({ onClose }: FavoritesPageProps) {
   const [favorites, setFavorites] = useState(mockFavorites)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null)
+  const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null)
 
   const handleDelete = (id: number) => {
     setFavorites((prev) => prev.filter((f) => f.id !== id))
     setShowDeleteConfirm(null)
+  }
+
+  if (selectedArticleId !== null) {
+    return (
+      <ArticleDetailPage
+        articleId={selectedArticleId}
+        onClose={() => setSelectedArticleId(null)}
+      />
+    )
   }
 
   return (
@@ -93,7 +103,7 @@ export default function FavoritesPage({ onClose, onArticleClick }: FavoritesPage
                 className="group relative overflow-hidden rounded-xl bg-card shadow-sm"
               >
                 <button
-                  onClick={() => onArticleClick?.(item.id)}
+                  onClick={() => setSelectedArticleId(item.id)}
                   className="flex w-full gap-3 p-3 text-left"
                 >
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">

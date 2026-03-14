@@ -14,6 +14,7 @@ import {
 
 interface HealthReportPageProps {
   onClose: () => void
+  onStartSkinTest?: () => void
 }
 
 const skinMetrics = [
@@ -54,7 +55,7 @@ const recommendations = [
   "保持充足睡眠，避免熬夜",
 ]
 
-export default function HealthReportPage({ onClose }: HealthReportPageProps) {
+export default function HealthReportPage({ onClose, onStartSkinTest }: HealthReportPageProps) {
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-background">
       {/* Header */}
@@ -226,7 +227,10 @@ export default function HealthReportPage({ onClose }: HealthReportPageProps) {
 
         {/* Action Button */}
         <div className="px-5 pt-2">
-          <button className="w-full rounded-xl bg-primary py-3 text-sm font-medium text-primary-foreground">
+          <button 
+            onClick={onStartSkinTest}
+            className="w-full rounded-xl bg-primary py-3 text-sm font-medium text-primary-foreground"
+          >
             开始新的皮肤检测
           </button>
         </div>

@@ -15,6 +15,10 @@ import {
 import Image from "next/image"
 import SearchPage from "./search-page"
 import ArticleDetailPage from "./article-detail-page"
+import NotificationsPage from "./profile/notifications-page"
+import SkinTestPage from "./skin-test-page"
+import SkincareGuidePage from "./skincare-guide-page"
+import SunscreenGuidePage from "./sunscreen-guide-page"
 
 const quickActions = [
   { icon: Eye, label: "AI识肤", color: "bg-primary/10 text-primary" },
@@ -186,6 +190,26 @@ interface HomePageProps {
 export default function HomePage({ onNavigateToAI }: HomePageProps) {
   const [showSearch, setShowSearch] = useState(false)
   const [selectedArticle, setSelectedArticle] = useState<typeof articles[0] | null>(null)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [showSkinTest, setShowSkinTest] = useState(false)
+  const [showSkincareGuide, setShowSkincareGuide] = useState(false)
+  const [showSunscreenGuide, setShowSunscreenGuide] = useState(false)
+
+  if (showNotifications) {
+    return <NotificationsPage onClose={() => setShowNotifications(false)} />
+  }
+
+  if (showSkinTest) {
+    return <SkinTestPage onClose={() => setShowSkinTest(false)} onNavigateToAI={onNavigateToAI} />
+  }
+
+  if (showSkincareGuide) {
+    return <SkincareGuidePage onClose={() => setShowSkincareGuide(false)} />
+  }
+
+  if (showSunscreenGuide) {
+    return <SunscreenGuidePage onClose={() => setShowSunscreenGuide(false)} />
+  }
 
   if (showSearch) {
     return (
@@ -219,7 +243,11 @@ export default function HomePage({ onNavigateToAI }: HomePageProps) {
             </div>
             <span className="text-lg font-bold text-primary">肤康</span>
           </div>
-          <button className="relative rounded-full p-2 transition-colors hover:bg-muted" aria-label="通知">
+          <button 
+            onClick={() => setShowNotifications(true)}
+            className="relative rounded-full p-2 transition-colors hover:bg-muted" 
+            aria-label="通知"
+          >
             <Bell className="h-5 w-5 text-foreground" />
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
           </button>
@@ -257,6 +285,12 @@ export default function HomePage({ onNavigateToAI }: HomePageProps) {
               onClick={() => {
                 if (index === 0 && onNavigateToAI) {
                   onNavigateToAI()
+                } else if (index === 1) {
+                  setShowSkinTest(true)
+                } else if (index === 2) {
+                  setShowSkincareGuide(true)
+                } else if (index === 3) {
+                  setShowSunscreenGuide(true)
                 }
               }}
               className="flex flex-col items-center gap-2 rounded-2xl bg-card p-3 shadow-sm transition-transform active:scale-95"

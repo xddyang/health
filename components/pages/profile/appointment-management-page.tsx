@@ -10,6 +10,7 @@ import {
   ChevronRight,
   X,
 } from "lucide-react"
+import AppointmentDetailPage from "./appointment-detail-page"
 
 interface AppointmentManagementPageProps {
   onClose: () => void
@@ -87,6 +88,7 @@ export default function AppointmentManagementPage({
     "all"
   )
   const [showCancelConfirm, setShowCancelConfirm] = useState<number | null>(null)
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null)
 
   const filteredAppointments = mockAppointments.filter((apt) => {
     if (activeTab === "all") return true
@@ -95,6 +97,15 @@ export default function AppointmentManagementPage({
       return apt.status === "completed" || apt.status === "cancelled"
     return true
   })
+
+  if (selectedAppointmentId !== null) {
+    return (
+      <AppointmentDetailPage
+        appointmentId={selectedAppointmentId}
+        onClose={() => setSelectedAppointmentId(null)}
+      />
+    )
+  }
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-background">
@@ -201,7 +212,10 @@ export default function AppointmentManagementPage({
                     >
                       取消预约
                     </button>
-                    <button className="flex-1 rounded-xl bg-primary py-2 text-xs font-medium text-primary-foreground">
+                    <button 
+                      onClick={() => setSelectedAppointmentId(apt.id)}
+                      className="flex-1 rounded-xl bg-primary py-2 text-xs font-medium text-primary-foreground"
+                    >
                       查看详情
                     </button>
                   </div>
@@ -209,7 +223,10 @@ export default function AppointmentManagementPage({
 
                 {apt.status === "completed" && (
                   <div className="mt-3 flex gap-2 border-t border-border pt-3">
-                    <button className="flex-1 rounded-xl bg-muted py-2 text-xs font-medium text-foreground">
+                    <button 
+                      onClick={() => setSelectedAppointmentId(apt.id)}
+                      className="flex-1 rounded-xl bg-muted py-2 text-xs font-medium text-foreground"
+                    >
                       查看病历
                     </button>
                     <button className="flex-1 rounded-xl bg-primary py-2 text-xs font-medium text-primary-foreground">
