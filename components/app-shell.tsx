@@ -1,5 +1,5 @@
 "use client"
-// MVP Version - 肤康皮肤健康助手
+// MVP Version v1.0 - 肤康皮肤健康助手
 import { useState } from "react"
 import { Home, MessageSquare, Camera } from "lucide-react"
 import HomePage from "@/components/pages/home-page"
