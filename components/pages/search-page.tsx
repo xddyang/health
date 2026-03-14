@@ -12,11 +12,45 @@ import {
   ThumbsUp,
 } from "lucide-react"
 import Image from "next/image"
-import { articles } from "./home-page"
 
-// 扩展更多可搜索的文章数据
+// 完整的文章数据（避免循环依赖）
 const allArticles = [
-  ...articles,
+  {
+    id: 1,
+    image: "/images/article-eczema.jpg",
+    tags: ["湿疹护理", "过敏防护"],
+    match: "95%",
+    title: "春季湿疹高发期，如何有效预防？",
+    description: "春季气温回升，空气中花粉增多，是湿疹的高发季节。专家教你科学预防和护理方法。",
+    views: "2.3万",
+    likes: 856,
+    publishDate: "2026-03-10",
+    readTime: "5分钟",
+  },
+  {
+    id: 2,
+    image: "/images/article-acne.jpg",
+    tags: ["痤疮治疗", "日常护理"],
+    match: "88%",
+    title: "告别反复痤疮，科学战痘全攻略",
+    description: "痤疮困扰着众多年轻人，正确认识痤疮成因，采取科学治疗方案是关键。",
+    views: "1.8万",
+    likes: 632,
+    publishDate: "2026-03-08",
+    readTime: "6分钟",
+  },
+  {
+    id: 3,
+    image: "/images/article-sunburn.jpg",
+    tags: ["防晒知识", "光老化"],
+    match: "82%",
+    title: "紫外线与皮肤老化：你不知道的真相",
+    description: "紫外线是皮肤老化的头号敌人，了解光老化机制，科学防晒抗衰老。",
+    views: "3.1万",
+    likes: 1204,
+    publishDate: "2026-03-05",
+    readTime: "4分钟",
+  },
   {
     id: 4,
     image: "/images/article-eczema.jpg",
