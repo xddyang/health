@@ -1,5 +1,5 @@
 "use client"
-
+// Search Page Component
 import { useState, useEffect, useMemo } from "react"
 import {
   ArrowLeft,
