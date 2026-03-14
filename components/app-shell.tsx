@@ -1,21 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { Home, MessageSquare, Camera, CalendarClock, User } from "lucide-react"
+import { Home, MessageSquare, Camera } from "lucide-react"
 import HomePage from "@/components/pages/home-page"
 import AiChatPage from "@/components/pages/ai-chat-page"
 import CameraPage from "@/components/pages/camera-page"
-import AppointmentPage from "@/components/pages/appointment-page"
-import ProfilePage from "@/components/pages/profile-page"
 
-type TabType = "home" | "ai" | "camera" | "appointment" | "profile"
+type TabType = "home" | "ai" | "camera"
 
 const tabs: { id: TabType; label: string; icon: typeof Home }[] = [
   { id: "home", label: "首页", icon: Home },
-  { id: "ai", label: "AI问诊", icon: MessageSquare },
   { id: "camera", label: "拍照", icon: Camera },
-  { id: "appointment", label: "挂号", icon: CalendarClock },
-  { id: "profile", label: "我的", icon: User },
+  { id: "ai", label: "AI问诊", icon: MessageSquare },
 ]
 
 export default function AppShell() {
@@ -35,10 +31,13 @@ export default function AppShell() {
     <div className="relative mx-auto flex h-dvh max-w-[430px] flex-col overflow-hidden bg-background">
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        {activeTab === "home" && <HomePage onNavigateToAI={() => setActiveTab("ai")} />}
+        {activeTab === "home" && (
+          <HomePage 
+            onNavigateToAI={() => setActiveTab("ai")} 
+            onOpenCamera={() => setShowCamera(true)} 
+          />
+        )}
         {activeTab === "ai" && <AiChatPage />}
-        {activeTab === "appointment" && <AppointmentPage />}
-        {activeTab === "profile" && <ProfilePage />}
       </main>
 
       {/* Camera Modal */}
@@ -46,7 +45,7 @@ export default function AppShell() {
         <CameraPage onClose={() => setShowCamera(false)} />
       )}
 
-      {/* Tab Bar */}
+      {/* Tab Bar - MVP: 3 tabs */}
       <nav className="relative z-50 flex shrink-0 items-end justify-around border-t border-border bg-card px-2 pb-6 pt-2">
         {tabs.map((tab) => {
           const Icon = tab.icon

@@ -3,28 +3,24 @@
 import { useState } from "react"
 import {
   Search,
-  Bell,
+  User,
   ChevronRight,
   Eye,
   ThumbsUp,
   Flame,
   Shield,
-  Droplets,
-  Sun,
+  Camera,
+  MessageSquare,
 } from "lucide-react"
 import Image from "next/image"
 import SearchPage from "./search-page"
 import ArticleDetailPage from "./article-detail-page"
-import NotificationsPage from "./profile/notifications-page"
-import SkinTestPage from "./skin-test-page"
-import SkincareGuidePage from "./skincare-guide-page"
-import SunscreenGuidePage from "./sunscreen-guide-page"
+import ProfileSimplePage from "./profile-simple-page"
 
+// MVP: 简化快捷入口，只保留核心功能
 const quickActions = [
-  { icon: Eye, label: "AI识肤", color: "bg-primary/10 text-primary" },
-  { icon: Shield, label: "皮肤自测", color: "bg-accent text-accent-foreground" },
-  { icon: Droplets, label: "护肤方案", color: "bg-secondary text-secondary-foreground" },
-  { icon: Sun, label: "防晒指南", color: "bg-primary/10 text-primary" },
+  { icon: Camera, label: "拍照识肤", color: "bg-primary/10 text-primary", action: "camera" },
+  { icon: MessageSquare, label: "AI问诊", color: "bg-accent text-accent-foreground", action: "ai" },
 ]
 
 export const articles = [
@@ -185,30 +181,17 @@ const hotTopics = [
 
 interface HomePageProps {
   onNavigateToAI?: () => void
+  onOpenCamera?: () => void
 }
 
-export default function HomePage({ onNavigateToAI }: HomePageProps) {
+export default function HomePage({ onNavigateToAI, onOpenCamera }: HomePageProps) {
   const [showSearch, setShowSearch] = useState(false)
   const [selectedArticle, setSelectedArticle] = useState<typeof articles[0] | null>(null)
-  const [showNotifications, setShowNotifications] = useState(false)
-  const [showSkinTest, setShowSkinTest] = useState(false)
-  const [showSkincareGuide, setShowSkincareGuide] = useState(false)
-  const [showSunscreenGuide, setShowSunscreenGuide] = useState(false)
+  const [showProfile, setShowProfile] = useState(false)
 
-  if (showNotifications) {
-    return <NotificationsPage onClose={() => setShowNotifications(false)} />
-  }
-
-  if (showSkinTest) {
-    return <SkinTestPage onClose={() => setShowSkinTest(false)} onNavigateToAI={onNavigateToAI} />
-  }
-
-  if (showSkincareGuide) {
-    return <SkincareGuidePage onClose={() => setShowSkincareGuide(false)} />
-  }
-
-  if (showSunscreenGuide) {
-    return <SunscreenGuidePage onClose={() => setShowSunscreenGuide(false)} />
+  // MVP: 简化版个人中心
+  if (showProfile) {
+    return <ProfileSimplePage onClose={() => setShowProfile(false)} />
   }
 
   if (showSearch) {
@@ -243,13 +226,13 @@ export default function HomePage({ onNavigateToAI }: HomePageProps) {
             </div>
             <span className="text-lg font-bold text-primary">肤康</span>
           </div>
+          {/* MVP: 简化个人中心入口 */}
           <button 
-            onClick={() => setShowNotifications(true)}
-            className="relative rounded-full p-2 transition-colors hover:bg-muted" 
-            aria-label="通知"
+            onClick={() => setShowProfile(true)}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-muted/80" 
+            aria-label="个人中心"
           >
-            <Bell className="h-5 w-5 text-foreground" />
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
+            <User className="h-5 w-5 text-foreground" />
           </button>
         </div>
 
@@ -275,34 +258,35 @@ export default function HomePage({ onNavigateToAI }: HomePageProps) {
         </button>
       </div>
 
-      {/* Quick Actions */}
-      <div className="mt-4 grid grid-cols-4 gap-3 px-5">
-        {quickActions.map((action, index) => {
+      {/* Quick Actions - MVP: 简化为2个核心入口 */}
+      <div className="mt-4 grid grid-cols-2 gap-3 px-5">
+        {quickActions.map((action) => {
           const Icon = action.icon
           return (
             <button
               key={action.label}
               onClick={() => {
-                if (index === 0 && onNavigateToAI) {
+                if (action.action === "camera" && onOpenCamera) {
+                  onOpenCamera()
+                } else if (action.action === "ai" && onNavigateToAI) {
                   onNavigateToAI()
-                } else if (index === 1) {
-                  setShowSkinTest(true)
-                } else if (index === 2) {
-                  setShowSkincareGuide(true)
-                } else if (index === 3) {
-                  setShowSunscreenGuide(true)
                 }
               }}
-              className="flex flex-col items-center gap-2 rounded-2xl bg-card p-3 shadow-sm transition-transform active:scale-95"
+              className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-sm transition-transform active:scale-95"
             >
               <div
-                className={`flex h-11 w-11 items-center justify-center rounded-xl ${action.color}`}
+                className={`flex h-12 w-12 items-center justify-center rounded-xl ${action.color}`}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className="h-6 w-6" />
               </div>
-              <span className="text-xs font-medium text-foreground">
-                {action.label}
-              </span>
+              <div className="text-left">
+                <span className="text-sm font-bold text-foreground">
+                  {action.label}
+                </span>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  {action.action === "camera" ? "AI智能分析皮肤" : "在线咨询问诊"}
+                </p>
+              </div>
             </button>
           )
         })}
