@@ -17,6 +17,8 @@ const tabs: { id: TabType; label: string; icon: typeof Home }[] = [
 export default function AppShell() {
   const [activeTab, setActiveTab] = useState<TabType>("home")
   const [showCamera, setShowCamera] = useState(false)
+  // 控制是否显示tabbar - 二级页面时隐藏
+  const [hideTabBar, setHideTabBar] = useState(false)
 
   const handleTabClick = (tabId: TabType) => {
     if (tabId === "camera") {
@@ -34,7 +36,8 @@ export default function AppShell() {
         {activeTab === "home" && (
           <HomePage 
             onNavigateToAI={() => setActiveTab("ai")} 
-            onOpenCamera={() => setShowCamera(true)} 
+            onOpenCamera={() => setShowCamera(true)}
+            onSubPageChange={setHideTabBar}
           />
         )}
         {activeTab === "ai" && <AiChatPage />}
@@ -45,7 +48,8 @@ export default function AppShell() {
         <CameraPage onClose={() => setShowCamera(false)} />
       )}
 
-      {/* Tab Bar - MVP: 3 tabs */}
+      {/* Tab Bar - MVP: 3 tabs, 二级页面时隐藏 */}
+      {!hideTabBar && (
       <nav className="relative z-50 flex shrink-0 items-end justify-around border-t border-border bg-card px-2 pb-6 pt-2">
         {tabs.map((tab) => {
           const Icon = tab.icon
@@ -93,6 +97,7 @@ export default function AppShell() {
           )
         })}
       </nav>
+      )}
     </div>
   )
 }
