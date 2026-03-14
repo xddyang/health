@@ -1,29 +1,32 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import {
   Search,
-  User,
+  Bell,
   ChevronRight,
   Eye,
   ThumbsUp,
   Flame,
   Shield,
-  Camera,
-  MessageSquare,
+  Droplets,
+  Sun,
 } from "lucide-react"
 import Image from "next/image"
 import SearchPage from "./search-page"
 import ArticleDetailPage from "./article-detail-page"
-import ProfileSimplePage from "./profile-simple-page"
+import NotificationsPage from "./profile/notifications-page"
+import SkinTestPage from "./skin-test-page"
+import SkincareGuidePage from "./skincare-guide-page"
+import SunscreenGuidePage from "./sunscreen-guide-page"
 
-// MVP: 简化快捷入口，只保留核心功能
 const quickActions = [
-  { icon: Camera, label: "拍照识肤", color: "bg-primary/10 text-primary", action: "camera" },
-  { icon: MessageSquare, label: "AI问诊", color: "bg-accent text-accent-foreground", action: "ai" },
+  { icon: Eye, label: "AI识肤", color: "bg-primary/10 text-primary" },
+  { icon: Shield, label: "皮肤自测", color: "bg-accent text-accent-foreground" },
+  { icon: Droplets, label: "护肤方案", color: "bg-secondary text-secondary-foreground" },
+  { icon: Sun, label: "防晒指南", color: "bg-primary/10 text-primary" },
 ]
 
-// MVP: 简化文章数据，移除医生信息
 export const articles = [
   {
     id: 1,
@@ -34,6 +37,41 @@ export const articles = [
     description: "春季气温回升，空气中花粉增多，是湿疹的高发季节。专家教你科学预防和护理方法。",
     views: "2.3万",
     likes: 856,
+    content: `
+## 什么是湿疹？
+
+湿疹是一种常见的皮肤炎症，主要表现为皮肤红肿、瘙痒、起水疱等症状。春季是湿疹的高发期，主要原因包括：
+
+1. **气温变化**：春季气温忽冷忽热，皮肤适应能力下降
+2. **花粉过敏**：空气中花粉浓度升高，容易引发过敏反应
+3. **空气湿度**：春季空气湿度变化大，影响皮肤屏障功能
+
+## 预防措施
+
+### 日常护理
+- 保持皮肤清洁和滋润
+- 使用温和无刺激的护肤品
+- 避免过度清洁和热水洗浴
+
+### 环境控制
+- 保持室内适宜湿度（40%-60%）
+- 定期清洁床上用品
+- 减少接触过敏原
+
+### 饮食建议
+- 多吃富含维生素的蔬果
+- 避免辛辣刺激食物
+- 适量补充水分
+
+## 何时就医
+
+如果出现以下情况，建议及时就医：
+- 症状持续加重
+- 出现渗液或感染
+- 影响日常生活和睡眠
+    `,
+    author: "李医生",
+    authorTitle: "主任医师",
     publishDate: "2026-03-10",
     readTime: "5分钟",
   },
@@ -46,6 +84,43 @@ export const articles = [
     description: "痤疮困扰着众多年轻人，正确认识痤疮成因，采取科学治疗方案是关键。",
     views: "1.8万",
     likes: 632,
+    content: `
+## 痤疮的形成原因
+
+痤疮（俗称青春痘）是一种毛囊皮脂腺的慢性炎症性疾病，主要由以下因素引起：
+
+1. **皮脂分泌过多**：雄激素刺激皮脂腺分泌增加
+2. **毛囊口堵塞**：角质细胞异常脱落，堵塞毛囊口
+3. **细菌感染**：痤疮丙酸杆菌繁殖引发炎症
+4. **炎症反应**：免疫系统对细菌的反应
+
+## 科学治疗方案
+
+### 轻度痤疮
+- 外用维A酸类药物
+- 过氧化苯甲酰
+- 水杨酸护肤品
+
+### 中度痤疮
+- 外用抗生素
+- 口服抗生素（需医生处方）
+- 联合外用药物治疗
+
+### 重度痤疮
+- 口服异维A酸（需严格医学监督）
+- 光动力治疗
+- 激素治疗
+
+## 日常护理要点
+
+- 温和清洁，每日早晚各一次
+- 选择无油配方护肤品
+- 不要用手挤压痘痘
+- 注意防晒
+- 保持规律作息
+    `,
+    author: "王医生",
+    authorTitle: "副主任医师",
     publishDate: "2026-03-08",
     readTime: "6分钟",
   },
@@ -58,6 +133,44 @@ export const articles = [
     description: "紫外线是皮肤老化的头号敌人，了解光老化机制，科学防晒抗衰老。",
     views: "3.1万",
     likes: 1204,
+    content: `
+## 紫外线的类型
+
+紫外线根据波长分为三种：
+
+- **UVA（320-400nm）**：穿透力最强，可达真皮层，是光老化的主要原因
+- **UVB（280-320nm）**：主要作用于表皮，是晒伤的主要原因
+- **UVC（100-280nm）**：被臭氧层吸收，基本无法到达地面
+
+## 光老化的危害
+
+长期紫外线照射会导致：
+1. 皮肤松弛和皱纹
+2. 色素沉着和色斑
+3. 皮肤干燥粗糙
+4. 增加皮肤癌风险
+
+## 科学防晒指南
+
+### 选择防晒产品
+- SPF值：日常使用SPF30，户外活动SPF50+
+- PA等级：PA+++以上
+- 广谱防护：同时防护UVA和UVB
+
+### 正确使用方法
+- 出门前15-30分钟涂抹
+- 用量足够（面部约一元硬币大小）
+- 每2小时补涂一次
+- 出汗或游泳后及时补涂
+
+### 物理防晒
+- 打遮阳伞
+- 戴宽檐帽
+- 穿防晒衣
+- 避免正午时段外出
+    `,
+    author: "张医生",
+    authorTitle: "皮肤科专家",
     publishDate: "2026-03-05",
     readTime: "4分钟",
   },
@@ -72,24 +185,30 @@ const hotTopics = [
 
 interface HomePageProps {
   onNavigateToAI?: () => void
-  onOpenCamera?: () => void
-  onSubPageChange?: (isSubPage: boolean) => void
 }
 
-export default function HomePage({ onNavigateToAI, onOpenCamera, onSubPageChange }: HomePageProps) {
+export default function HomePage({ onNavigateToAI }: HomePageProps) {
   const [showSearch, setShowSearch] = useState(false)
   const [selectedArticle, setSelectedArticle] = useState<typeof articles[0] | null>(null)
-  const [showProfile, setShowProfile] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [showSkinTest, setShowSkinTest] = useState(false)
+  const [showSkincareGuide, setShowSkincareGuide] = useState(false)
+  const [showSunscreenGuide, setShowSunscreenGuide] = useState(false)
 
-  // 通知父组件当前是否在二级页面
-  const isInSubPage = showSearch || selectedArticle !== null || showProfile
-  useEffect(() => {
-    onSubPageChange?.(isInSubPage)
-  }, [isInSubPage, onSubPageChange])
+  if (showNotifications) {
+    return <NotificationsPage onClose={() => setShowNotifications(false)} />
+  }
 
-  // MVP: 简化版个人中心
-  if (showProfile) {
-    return <ProfileSimplePage onClose={() => setShowProfile(false)} />
+  if (showSkinTest) {
+    return <SkinTestPage onClose={() => setShowSkinTest(false)} onNavigateToAI={onNavigateToAI} />
+  }
+
+  if (showSkincareGuide) {
+    return <SkincareGuidePage onClose={() => setShowSkincareGuide(false)} />
+  }
+
+  if (showSunscreenGuide) {
+    return <SunscreenGuidePage onClose={() => setShowSunscreenGuide(false)} />
   }
 
   if (showSearch) {
@@ -124,13 +243,13 @@ export default function HomePage({ onNavigateToAI, onOpenCamera, onSubPageChange
             </div>
             <span className="text-lg font-bold text-primary">肤康</span>
           </div>
-          {/* MVP: 简化个人中心入口 */}
           <button 
-            onClick={() => setShowProfile(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-muted transition-colors hover:bg-muted/80" 
-            aria-label="个人中心"
+            onClick={() => setShowNotifications(true)}
+            className="relative rounded-full p-2 transition-colors hover:bg-muted" 
+            aria-label="通知"
           >
-            <User className="h-5 w-5 text-foreground" />
+            <Bell className="h-5 w-5 text-foreground" />
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
           </button>
         </div>
 
@@ -156,35 +275,34 @@ export default function HomePage({ onNavigateToAI, onOpenCamera, onSubPageChange
         </button>
       </div>
 
-      {/* Quick Actions - MVP: 简化为2个核心入口 */}
-      <div className="mt-4 grid grid-cols-2 gap-3 px-5">
-        {quickActions.map((action) => {
+      {/* Quick Actions */}
+      <div className="mt-4 grid grid-cols-4 gap-3 px-5">
+        {quickActions.map((action, index) => {
           const Icon = action.icon
           return (
             <button
               key={action.label}
               onClick={() => {
-                if (action.action === "camera" && onOpenCamera) {
-                  onOpenCamera()
-                } else if (action.action === "ai" && onNavigateToAI) {
+                if (index === 0 && onNavigateToAI) {
                   onNavigateToAI()
+                } else if (index === 1) {
+                  setShowSkinTest(true)
+                } else if (index === 2) {
+                  setShowSkincareGuide(true)
+                } else if (index === 3) {
+                  setShowSunscreenGuide(true)
                 }
               }}
-              className="flex items-center gap-3 rounded-2xl bg-card p-4 shadow-sm transition-transform active:scale-95"
+              className="flex flex-col items-center gap-2 rounded-2xl bg-card p-3 shadow-sm transition-transform active:scale-95"
             >
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-xl ${action.color}`}
+                className={`flex h-11 w-11 items-center justify-center rounded-xl ${action.color}`}
               >
-                <Icon className="h-6 w-6" />
+                <Icon className="h-5 w-5" />
               </div>
-              <div className="text-left">
-                <span className="text-sm font-bold text-foreground">
-                  {action.label}
-                </span>
-                <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  {action.action === "camera" ? "AI智能分析皮肤" : "在线咨询问诊"}
-                </p>
-              </div>
+              <span className="text-xs font-medium text-foreground">
+                {action.label}
+              </span>
             </button>
           )
         })}

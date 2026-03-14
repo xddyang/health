@@ -1,12 +1,11 @@
 "use client"
 
-import { X, Camera, ImageIcon, Zap, RotateCcw, ScanLine, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react"
-import { useState, useRef } from "react"
+import { X, Camera, ImageIcon, Zap, RotateCcw, ScanLine, ArrowLeft, AlertCircle, CheckCircle2, ChevronRight } from "lucide-react"
+import { useState } from "react"
 import Image from "next/image"
 
 interface CameraPageProps {
   onClose: () => void
-  onConsultDoctor?: (image: string) => void
 }
 
 // Mock analysis results
@@ -41,13 +40,12 @@ const mockAnalysisResults = [
   },
 ]
 
-export default function CameraPage({ onClose, onConsultDoctor }: CameraPageProps) {
+export default function CameraPage({ onClose }: CameraPageProps) {
   const [flashOn, setFlashOn] = useState(false)
   const [isCapturing, setIsCapturing] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [showResult, setShowResult] = useState(false)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
-  const galleryInputRef = useRef<HTMLInputElement>(null)
 
   const handleCapture = () => {
     setIsCapturing(true)
@@ -65,25 +63,13 @@ export default function CameraPage({ onClose, onConsultDoctor }: CameraPageProps
   }
 
   const handleSelectFromGallery = () => {
-    // 打开设备相册
-    galleryInputRef.current?.click()
-  }
-
-  const handleGalleryImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const imageData = reader.result as string
-        setCapturedImage(imageData)
-        setIsAnalyzing(true)
-        setTimeout(() => {
-          setIsAnalyzing(false)
-          setShowResult(true)
-        }, 2000)
-      }
-      reader.readAsDataURL(file)
-    }
+    // Simulate selecting from gallery
+    setCapturedImage("/images/article-eczema.jpg")
+    setIsAnalyzing(true)
+    setTimeout(() => {
+      setIsAnalyzing(false)
+      setShowResult(true)
+    }, 2000)
   }
 
   const handleRetake = () => {
@@ -95,7 +81,7 @@ export default function CameraPage({ onClose, onConsultDoctor }: CameraPageProps
   // Analysis Result Page
   if (showResult) {
     return (
-      <div className="absolute inset-0 z-50 flex flex-col bg-background">
+      <div className="absolute inset-0 z-40 flex flex-col bg-background">
         <div className="flex items-center gap-3 bg-card px-4 pb-4 pt-12 shadow-sm">
           <button onClick={handleRetake} className="rounded-full bg-muted p-2" aria-label="返回">
             <ArrowLeft className="h-5 w-5 text-foreground" />
@@ -104,7 +90,7 @@ export default function CameraPage({ onClose, onConsultDoctor }: CameraPageProps
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {/* Captured Image - 移除AI已分析标签 */}
+          {/* Captured Image */}
           <div className="relative aspect-square w-full">
             <Image
               src={capturedImage || "/images/article-acne.jpg"}
@@ -112,6 +98,9 @@ export default function CameraPage({ onClose, onConsultDoctor }: CameraPageProps
               fill
               className="object-cover"
             />
+            <div className="absolute bottom-3 right-3 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+              AI 已分析
+            </div>
           </div>
 
           <div className="px-5 py-4">
@@ -160,7 +149,7 @@ export default function CameraPage({ onClose, onConsultDoctor }: CameraPageProps
               </div>
             </div>
 
-            {/* Actions - 移除历史分析记录按钮 */}
+            {/* Actions */}
             <div className="mt-4 flex gap-3">
               <button
                 onClick={handleRetake}
@@ -169,18 +158,18 @@ export default function CameraPage({ onClose, onConsultDoctor }: CameraPageProps
                 重新拍摄
               </button>
               <button
-                onClick={() => {
-                  if (capturedImage && onConsultDoctor) {
-                    onConsultDoctor(capturedImage)
-                  } else {
-                    onClose()
-                  }
-                }}
+                onClick={onClose}
                 className="flex-1 rounded-xl bg-primary py-3 text-sm font-medium text-primary-foreground"
               >
                 咨询医生
               </button>
             </div>
+
+            {/* History Link */}
+            <button className="mt-3 flex w-full items-center justify-center gap-1 py-2 text-xs text-muted-foreground">
+              查看历史分析记录
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
       </div>
@@ -190,7 +179,7 @@ export default function CameraPage({ onClose, onConsultDoctor }: CameraPageProps
   // Analyzing State
   if (isAnalyzing) {
     return (
-      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-foreground">
+      <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-foreground">
         <div className="relative h-48 w-48 overflow-hidden rounded-2xl">
           <Image
             src={capturedImage || "/images/article-acne.jpg"}
@@ -210,7 +199,7 @@ export default function CameraPage({ onClose, onConsultDoctor }: CameraPageProps
   }
 
   return (
-    <div className={`absolute inset-0 z-50 flex flex-col bg-foreground ${isCapturing ? "bg-card" : ""}`}>
+    <div className={`absolute inset-0 z-40 flex flex-col bg-foreground ${isCapturing ? "bg-card" : ""}`}>
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-12 pb-4">
         <button onClick={onClose} className="rounded-full bg-card/20 p-2" aria-label="关闭">
@@ -280,15 +269,6 @@ export default function CameraPage({ onClose, onConsultDoctor }: CameraPageProps
           <span className="text-[10px] text-card/70">翻转</span>
         </button>
       </div>
-
-      {/* 隐藏的相册选择input */}
-      <input
-        ref={galleryInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleGalleryImageSelect}
-        className="hidden"
-      />
     </div>
   )
 }

@@ -1,13 +1,16 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import {
   ArrowLeft,
   Share2,
   Bookmark,
+  ThumbsUp,
+  MessageCircle,
   Eye,
   Clock,
+  ChevronRight,
   BookmarkCheck,
   Heart,
 } from "lucide-react"
@@ -144,7 +147,7 @@ const articlesData: Record<number, {
       "**选择合适的防晒霜**\n- SPF值：防护UVB能力，日常SPF30即可\n- PA值：防护UVA能力，PA+++以上\n- 用量要足：面部约1元硬币大小\n- 及时补涂：每2-3小时补涂一次",
       "**物理防晒同样重要**\n- 遮阳伞、太阳帽\n- 防晒衣、墨镜\n- 避开正午强烈阳光",
       "## 已经晒伤怎么办",
-      "1. 立即冷敷，镇静舒缓\n2. 涂抹芦荟凝胶���保湿���\n3. 避免再次日晒\n4. 严重晒伤应就医处理",
+      "1. 立即冷敷，镇静舒缓\n2. 涂抹芦荟凝胶或保湿霜\n3. 避免再次日晒\n4. 严重晒伤应就医处理",
       "## 光老化的修复",
       "已经出现的光老化可以通过以下方式改善：\n- 使用含维A酸、维C的护肤品\n- 医美项目如光子嫩肤、点阵激光\n- 坚持防晒是最基本的前提",
     ],
@@ -166,25 +169,11 @@ export default function ArticleDetailPage({
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(article.likes)
-  const [showShareSuccess, setShowShareSuccess] = useState(false)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-
-  const handleShare = () => {
-    setShowShareSuccess(true)
-    setTimeout(() => {
-      setShowShareSuccess(false)
-    }, 2000)
-  }
   
-  // Reset states when article changes - 直接重置滚动位置，模拟打开新页面
+  // Reset states when article changes
   const handleArticleChange = (newArticleId: number) => {
-    // 先重置滚动位置到顶部（无动画，直接到顶）
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = 0
-    }
     setCurrentArticleId(newArticleId)
     setIsLiked(false)
-    setIsBookmarked(false)
     setLikeCount(articlesData[newArticleId]?.likes || 0)
   }
 
@@ -221,7 +210,6 @@ export default function ArticleDetailPage({
             )}
           </button>
           <button
-            onClick={handleShare}
             className="rounded-full bg-muted/80 p-2 transition-colors hover:bg-muted"
             aria-label="分享"
           >
@@ -231,7 +219,7 @@ export default function ArticleDetailPage({
       </div>
 
       {/* Content */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto">
         {/* Hero Image */}
         <div className="relative aspect-[16/9] w-full">
           <Image
@@ -273,6 +261,35 @@ export default function ArticleDetailPage({
             </span>
             <span>{article.publishDate}</span>
           </div>
+
+          {/* Author */}
+          <button
+            onClick={() => onDoctorClick?.(article.author.id)}
+            className="mt-4 flex w-full items-center gap-3 rounded-xl bg-card p-3 shadow-sm transition-transform active:scale-[0.98]"
+          >
+            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
+              <Image
+                src={article.author.avatar}
+                alt={article.author.name}
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="flex-1 text-left">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-foreground">
+                  {article.author.name}
+                </span>
+                <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
+                  {article.author.title}
+                </span>
+              </div>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                点击查看医生主页，可预约问诊
+              </p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
 
           {/* Article Content */}
           <article className="mt-6 space-y-4">
@@ -330,55 +347,39 @@ export default function ArticleDetailPage({
         </div>
       </div>
 
-      {/* Bottom Action Bar - MVP: 简化，只保留点赞和收藏 */}
-      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-12 border-t border-border bg-card px-5 py-3 pb-6">
-        <button
-          onClick={handleLike}
-          className="flex items-center gap-1.5"
-        >
-          <Heart
-            className={`h-5 w-5 transition-colors ${
-              isLiked
-                ? "fill-destructive text-destructive"
-                : "text-muted-foreground"
-            }`}
-          />
-          <span
-            className={`text-sm ${
-              isLiked ? "text-destructive" : "text-muted-foreground"
-            }`}
+      {/* Bottom Action Bar */}
+      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between border-t border-border bg-card px-5 py-3 pb-6">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleLike}
+            className="flex items-center gap-1.5"
           >
-            {likeCount}
-          </span>
-        </button>
-        <button
-          onClick={() => setIsBookmarked(!isBookmarked)}
-          className="flex items-center gap-1.5"
-        >
-          {isBookmarked ? (
-            <BookmarkCheck className="h-5 w-5 text-primary" />
-          ) : (
-            <Bookmark className="h-5 w-5 text-muted-foreground" />
-          )}
-          <span className={`text-sm ${isBookmarked ? "text-primary" : "text-muted-foreground"}`}>
-            收藏
-          </span>
+            <Heart
+              className={`h-5 w-5 transition-colors ${
+                isLiked
+                  ? "fill-destructive text-destructive"
+                  : "text-muted-foreground"
+              }`}
+            />
+            <span
+              className={`text-sm ${
+                isLiked ? "text-destructive" : "text-muted-foreground"
+              }`}
+            >
+              {likeCount}
+            </span>
+          </button>
+          <button className="flex items-center gap-1.5">
+            <MessageCircle className="h-5 w-5 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              {article.comments}
+            </span>
+          </button>
+        </div>
+        <button className="rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground">
+          咨询医生
         </button>
       </div>
-
-      {/* 分享成功弹窗 */}
-      {showShareSuccess && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-foreground/20">
-          <div className="rounded-xl bg-card px-6 py-4 shadow-lg">
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                <Share2 className="h-5 w-5 text-primary" />
-              </div>
-              <p className="text-sm font-medium text-foreground">分享成功</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

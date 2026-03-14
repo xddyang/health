@@ -14,18 +14,7 @@ import {
 
 interface ChatHistoryPageProps {
   onClose: () => void
-  onSelectChat: (chatId: number, messages: Message[]) => void
-  savedSessions?: ChatSession[]
-}
-
-export type { ChatSession, Message }
-
-interface Message {
-  id: number
-  role: "user" | "ai"
-  content: string
-  time: string
-  image?: string
+  onSelectChat: (chatId: number) => void
 }
 
 interface ChatSession {
@@ -34,77 +23,59 @@ interface ChatSession {
   lastMessage: string
   date: string
   messageCount: number
-  messages: Message[]
 }
 
-// 完整的mock历史对话数据，包含每个对话的详细消息
 const mockChatHistory: ChatSession[] = [
   {
     id: 1,
     title: "脸上长痘痘咨询",
     lastMessage: "建议使用含水杨酸的护肤品，避免用手挤压...",
     date: "今天 14:30",
-    messageCount: 4,
-    messages: [
-      { id: 1, role: "ai", content: "您好！我是肤康AI助手。请问有什么可以帮助您的？", time: "14:25" },
-      { id: 2, role: "user", content: "我脸上最近长了一些痘痘，应该怎么处理？", time: "14:26" },
-      { id: 3, role: "ai", content: "根据您的描述，这可能是痤疮。建议：\n1. 保持面部清洁，使用温和洁面产品\n2. 避免用手挤压\n3. 选择含水杨酸或苯甲酰过氧化物的护肤品\n4. 如果反复发作，建议到皮肤科就诊", time: "14:27" },
-      { id: 4, role: "user", content: "好的，谢谢医生", time: "14:30" },
-    ],
+    messageCount: 8,
   },
   {
     id: 2,
     title: "皮肤干燥脱皮问题",
     lastMessage: "皮肤干燥可能与季节变化有关，建议加强保湿...",
     date: "昨天 10:15",
-    messageCount: 4,
-    messages: [
-      { id: 1, role: "ai", content: "您好！我是肤康AI助手。请问有什么可以帮助您的？", time: "10:10" },
-      { id: 2, role: "user", content: "最近皮肤特别干燥，还有点脱皮，怎么回事？", time: "10:11" },
-      { id: 3, role: "ai", content: "皮肤干燥脱皮可能与以下原因有关：\n1. 季节变化导致空气干燥\n2. 皮肤屏障受损\n3. 过度清洁\n4. 缺乏保湿\n\n建议使用温和保湿霜，避免热水洗脸，如持续加重请及时就医。", time: "10:13" },
-      { id: 4, role: "user", content: "明白了，我去买点保湿霜", time: "10:15" },
-    ],
+    messageCount: 12,
   },
   {
     id: 3,
     title: "过敏性皮炎咨询",
     lastMessage: "过敏性皮炎需要远离过敏原，可以使用温和的护肤品...",
     date: "3月10日",
-    messageCount: 4,
-    messages: [
-      { id: 1, role: "ai", content: "您好！我是肤康AI助手。请问有什么可以帮助您的？", time: "09:00" },
-      { id: 2, role: "user", content: "我怀疑自己是过敏性皮炎，应该怎么判断？", time: "09:02" },
-      { id: 3, role: "ai", content: "过敏性皮炎的常见表现：\n1. 皮肤红斑、丘疹\n2. 明显瘙痒\n3. 可能伴有脱屑\n4. 接触某些物质后加重\n\n建议远离过敏原，使用温和护肤品，必要时就医使用抗组胺药物。", time: "09:04" },
-      { id: 4, role: "user", content: "好的，我会注意观察的", time: "09:05" },
-    ],
+    messageCount: 6,
   },
   {
     id: 4,
     title: "湿疹护理方法",
     lastMessage: "湿疹发作时要保持皮肤清洁干燥，避免搔抓...",
     date: "3月8日",
+    messageCount: 15,
+  },
+  {
+    id: 5,
+    title: "防晒霜选择建议",
+    lastMessage: "日常防晒建议选择SPF30、PA+++的防晒霜...",
+    date: "3月5日",
     messageCount: 4,
-    messages: [
-      { id: 1, role: "ai", content: "您好！我是肤康AI助手。请问有什么可以帮助您的？", time: "15:00" },
-      { id: 2, role: "user", content: "湿疹发作了，有什么护理方法吗？", time: "15:02" },
-      { id: 3, role: "ai", content: "湿疹护理建议：\n1. 保持皮肤清洁干燥\n2. 避免搔抓，可以轻拍止痒\n3. 使用温和无刺激的护肤品\n4. 穿宽松棉质衣物\n5. 如症状严重请及时就医", time: "15:04" },
-      { id: 4, role: "user", content: "谢谢，我先试试这些方法", time: "15:05" },
-    ],
+  },
+  {
+    id: 6,
+    title: "儿童皮肤问题",
+    lastMessage: "儿童皮肤较敏感，建议使用专门的儿童护肤品...",
+    date: "3月1日",
+    messageCount: 10,
   },
 ]
 
 export default function ChatHistoryPage({
   onClose,
   onSelectChat,
-  savedSessions = [],
 }: ChatHistoryPageProps) {
   const [searchQuery, setSearchQuery] = useState("")
-  // 合并已保存的对话和mock数据
-  const [sessions, setSessions] = useState<ChatSession[]>(() => {
-    const allSessions = [...savedSessions, ...mockChatHistory]
-    // 按时间排序，新的在前
-    return allSessions.sort((a, b) => b.id - a.id)
-  })
+  const [sessions, setSessions] = useState(mockChatHistory)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null)
   const [activeMenu, setActiveMenu] = useState<number | null>(null)
 
@@ -182,12 +153,9 @@ export default function ChatHistoryPage({
           <div className="flex flex-col gap-2">
             {filteredSessions.map((session) => (
               <div key={session.id} className="relative">
-                <div
-                  onClick={() => onSelectChat(session.id, session.messages)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === "Enter" && onSelectChat(session.id, session.messages)}
-                  className="flex w-full cursor-pointer items-start gap-3 rounded-xl bg-card p-4 text-left shadow-sm transition-transform active:scale-[0.98]"
+                <button
+                  onClick={() => onSelectChat(session.id)}
+                  className="flex w-full items-start gap-3 rounded-xl bg-card p-4 text-left shadow-sm transition-transform active:scale-[0.98]"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
                     <MessageSquare className="h-5 w-5 text-primary" />
@@ -221,7 +189,7 @@ export default function ChatHistoryPage({
                     </div>
                   </div>
                   <ChevronRight className="mt-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                </div>
+                </button>
 
                 {/* Dropdown Menu */}
                 {activeMenu === session.id && (
