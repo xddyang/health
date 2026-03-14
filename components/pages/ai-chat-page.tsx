@@ -3,15 +3,8 @@
 import { useState, useRef, useEffect } from "react"
 import { Send, Bot, User, Sparkles, Stethoscope, PlusCircle, History, ImagePlus, Camera, Upload, X } from "lucide-react"
 import Image from "next/image"
-import ChatHistoryPage from "./chat-history-page"
-
-interface Message {
-  id: number
-  role: "user" | "ai"
-  content: string
-  time: string
-  image?: string // 添加图片字段
-}
+import ChatHistoryPage, { type ChatSession, type Message } from "./chat-history-page"
+import CameraPage from "./camera-page"
 
 const suggestedQuestions = [
   "脸上长痘痘怎么处理？",
@@ -36,9 +29,11 @@ export default function AiChatPage() {
   const [showHistory, setShowHistory] = useState(false)
   const [showImageMenu, setShowImageMenu] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [showCamera, setShowCamera] = useState(false)
+  const [savedSessions, setSavedSessions] = useState<ChatSession[]>([])
+  const [currentSessionId, setCurrentSessionId] = useState<number | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const cameraInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -95,29 +90,49 @@ export default function AiChatPage() {
     setInputValue(question)
   }
 
-  const handleSelectChat = (chatId: number) => {
-    // Load chat history based on chatId
-    const mockHistoryMessages: Message[] = [
-      {
-        id: 1,
-        role: "ai",
-        content: "您好！我是肤康AI助手。请问有什么可以帮助您的？",
-        time: "10:00",
-      },
-      {
-        id: 2,
-        role: "user",
-        content: "我脸上最近长了一些痘痘，应该怎么处理？",
-        time: "10:01",
-      },
-      {
-        id: 3,
-        role: "ai",
-        content: "根据您的描述，这可能是痤疮。建议：\n1. 保持面部清洁，使用温和洁面产品\n2. 避免用手挤压\n3. 选择含水杨酸或苯甲酰过氧化物的护肤品\n4. 如果反复发作，建议到皮肤科就诊",
-        time: "10:01",
-      },
-    ]
-    setMessages(mockHistoryMessages)
+  // 保存当前对话到历史记录
+  const saveCurrentSession = () => {
+    if (messages.length > 1) {
+      // 只有有实际对话才保存
+      const userMessages = messages.filter((m) => m.role === "user")
+      if (userMessages.length > 0) {
+        const firstUserMessage = userMessages[0].content
+        const lastAiMessage = messages.filter((m) => m.role === "ai").pop()
+        
+        const newSession: ChatSession = {
+          id: Date.now(),
+          title: firstUserMessage.slice(0, 20) + (firstUserMessage.length > 20 ? "..." : ""),
+          lastMessage: lastAiMessage?.content.slice(0, 50) + "..." || "",
+          date: "刚刚",
+          messageCount: messages.length,
+          messages: [...messages],
+        }
+        
+        // 检查是否已存在该会话（编辑现有会话）
+        if (currentSessionId) {
+          setSavedSessions((prev) =>
+            prev.map((s) => (s.id === currentSessionId ? newSession : s))
+          )
+        } else {
+          setSavedSessions((prev) => [newSession, ...prev])
+        }
+      }
+    }
+  }
+
+  // 新建对话
+  const handleNewChat = () => {
+    saveCurrentSession()
+    setMessages(initialMessages)
+    setCurrentSessionId(null)
+  }
+
+  const handleSelectChat = (chatId: number, chatMessages: Message[]) => {
+    // 先保存当前对话
+    saveCurrentSession()
+    // 加载选中的对话
+    setMessages(chatMessages)
+    setCurrentSessionId(chatId)
     setShowHistory(false)
   }
 
@@ -128,7 +143,13 @@ export default function AiChatPage() {
         <ChatHistoryPage
           onClose={() => setShowHistory(false)}
           onSelectChat={handleSelectChat}
+          savedSessions={savedSessions}
         />
+      )}
+
+      {/* Camera Page */}
+      {showCamera && (
+        <CameraPage onClose={() => setShowCamera(false)} />
       )}
 
       {/* Header */}
@@ -157,9 +178,7 @@ export default function AiChatPage() {
               <History className="h-5 w-5 text-muted-foreground" />
             </button>
             <button
-              onClick={() => {
-                setMessages(initialMessages)
-              }}
+              onClick={handleNewChat}
               className="rounded-full bg-muted p-2 transition-colors hover:bg-accent"
               aria-label="新对话"
             >
@@ -261,10 +280,10 @@ export default function AiChatPage() {
             </div>
             <button
               onClick={() => setSelectedImage(null)}
-              className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-sm"
+              className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 shadow-md"
               aria-label="移除图片"
             >
-              <X className="h-3 w-3" />
+              <X className="h-3 w-3 text-white" strokeWidth={3} />
             </button>
           </div>
         )}
@@ -284,7 +303,10 @@ export default function AiChatPage() {
             {showImageMenu && (
               <div className="absolute bottom-12 left-0 z-50 w-36 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
                 <button
-                  onClick={() => cameraInputRef.current?.click()}
+                  onClick={() => {
+                    setShowImageMenu(false)
+                    setShowCamera(true)
+                  }}
                   className="flex w-full items-center gap-2 px-4 py-3 text-sm text-foreground transition-colors hover:bg-muted"
                 >
                   <Camera className="h-4 w-4 text-primary" />
@@ -301,19 +323,11 @@ export default function AiChatPage() {
               </div>
             )}
             
-            {/* 隐藏的文件输入 */}
+            {/* 隐藏的文件输入 - 仅用于从相册选择 */}
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
-              onChange={handleImageSelect}
-              className="hidden"
-            />
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
               onChange={handleImageSelect}
               className="hidden"
             />
