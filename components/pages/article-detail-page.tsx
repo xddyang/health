@@ -144,7 +144,7 @@ const articlesData: Record<number, {
       "**选择合适的防晒霜**\n- SPF值：防护UVB能力，日常SPF30即可\n- PA值：防护UVA能力，PA+++以上\n- 用量要足：面部约1元硬币大小\n- 及时补涂：每2-3小时补涂一次",
       "**物理防晒同样重要**\n- 遮阳伞、太阳帽\n- 防晒衣、墨镜\n- 避开正午强烈阳光",
       "## 已经晒伤怎么办",
-      "1. 立即冷敷，镇静舒缓\n2. 涂抹芦荟凝胶或保湿���\n3. 避免再次日晒\n4. 严重晒伤应就医处理",
+      "1. 立即冷敷，镇静舒缓\n2. 涂抹芦荟凝胶���保湿���\n3. 避免再次日晒\n4. 严重晒伤应就医处理",
       "## 光老化的修复",
       "已经出现的光老化可以通过以下方式改善：\n- 使用含维A酸、维C的护肤品\n- 医美项目如光子嫩肤、点阵激光\n- 坚持防晒是最基本的前提",
     ],
@@ -176,13 +176,16 @@ export default function ArticleDetailPage({
     }, 2000)
   }
   
-  // Reset states when article changes and scroll to top
+  // Reset states when article changes - 直接重置滚动位置，模拟打开新页面
   const handleArticleChange = (newArticleId: number) => {
+    // 先重置滚动位置到顶部（无动画，直接到顶）
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0
+    }
     setCurrentArticleId(newArticleId)
     setIsLiked(false)
+    setIsBookmarked(false)
     setLikeCount(articlesData[newArticleId]?.likes || 0)
-    // 滚动到顶部
-    scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   const handleLike = () => {
