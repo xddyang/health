@@ -26,6 +26,7 @@ import SettingsPage from "./profile/settings-page"
 import HealthReportPage from "./profile/health-report-page"
 import PaymentPage from "./profile/payment-page"
 import HelpPage from "./profile/help-page"
+import CameraPage from "./camera-page"
 
 type SubPage =
   | "none"
@@ -40,6 +41,7 @@ type SubPage =
   | "payment"
   | "help"
   | "privacy"
+  | "camera"
 
 const stats = [
   { label: "咨询记录", value: "12", icon: FileText, page: "consultation" as SubPage },
@@ -90,7 +92,9 @@ export default function ProfilePage() {
       case "settings":
         return <SettingsPage onClose={() => setCurrentPage("none")} />
       case "health":
-        return <HealthReportPage onClose={() => setCurrentPage("none")} />
+        return <HealthReportPage onClose={() => setCurrentPage("none")} onStartSkinTest={() => setCurrentPage("camera")} />
+      case "camera":
+        return <CameraPage onClose={() => setCurrentPage("none")} />
       case "payment":
         return <PaymentPage onClose={() => setCurrentPage("none")} />
       case "help":

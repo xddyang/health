@@ -227,7 +227,10 @@ export default function HealthReportPage({ onClose, onStartSkinTest }: HealthRep
 
         {/* Action Button */}
         <div className="px-5 pt-2">
-          <button className="w-full rounded-xl bg-primary py-3 text-sm font-medium text-primary-foreground">
+          <button 
+            onClick={onStartSkinTest}
+            className="w-full rounded-xl bg-primary py-3 text-sm font-medium text-primary-foreground"
+          >
             开始新的皮肤检测
           </button>
         </div>

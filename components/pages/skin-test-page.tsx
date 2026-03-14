@@ -227,6 +227,11 @@ export default function SkinTestPage({ onClose, onNavigateToAI }: SkinTestPagePr
   }
 
   const progress = ((currentQuestion + 1) / questions.length) * 100
+  const currentQ = questions[currentQuestion]
+
+  if (!currentQ) {
+    return null
+  }
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-background">
@@ -252,11 +257,11 @@ export default function SkinTestPage({ onClose, onNavigateToAI }: SkinTestPagePr
 
       <div className="flex-1 px-5 py-4">
         <h2 className="text-lg font-bold text-foreground">
-          {questions[currentQuestion].question}
+          {currentQ.question}
         </h2>
 
         <div className="mt-6 space-y-3">
-          {questions[currentQuestion].options.map((option, idx) => (
+          {currentQ.options.map((option, idx) => (
             <button
               key={idx}
               onClick={() => handleAnswer(option)}
