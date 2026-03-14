@@ -9,6 +9,7 @@ import {
   Bot,
   User,
 } from "lucide-react"
+import ConsultationDetailPage from "./consultation-detail-page"
 
 interface ConsultationRecordsPageProps {
   onClose: () => void
@@ -61,11 +62,21 @@ export default function ConsultationRecordsPage({
   onClose,
 }: ConsultationRecordsPageProps) {
   const [activeTab, setActiveTab] = useState<"all" | "ai" | "doctor">("all")
+  const [selectedRecordId, setSelectedRecordId] = useState<number | null>(null)
 
   const filteredRecords = mockRecords.filter((record) => {
     if (activeTab === "all") return true
     return record.type === activeTab
   })
+
+  if (selectedRecordId !== null) {
+    return (
+      <ConsultationDetailPage
+        recordId={selectedRecordId}
+        onClose={() => setSelectedRecordId(null)}
+      />
+    )
+  }
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-background">
@@ -119,6 +130,7 @@ export default function ConsultationRecordsPage({
             {filteredRecords.map((record) => (
               <button
                 key={record.id}
+                onClick={() => setSelectedRecordId(record.id)}
                 className="flex items-start gap-3 rounded-xl bg-card p-4 text-left shadow-sm transition-transform active:scale-[0.98]"
               >
                 <div

@@ -16,7 +16,21 @@ import {
 } from "lucide-react"
 
 interface ArticleDetailPageProps {
-  articleId: number
+  article?: {
+    id: number
+    title: string
+    image: string
+    tags: string[]
+    description: string
+    views: string
+    likes: number
+    content?: string
+    author?: string
+    authorTitle?: string
+    publishDate?: string
+    readTime?: string
+  }
+  articleId?: number
   onClose: () => void
   onDoctorClick?: (doctorId: number) => void
 }
@@ -145,14 +159,23 @@ const articlesData: Record<number, {
 }
 
 export default function ArticleDetailPage({
+  article: articleProp,
   articleId,
   onClose,
   onDoctorClick,
 }: ArticleDetailPageProps) {
-  const article = articlesData[articleId] || articlesData[1]
+  const [currentArticleId, setCurrentArticleId] = useState(articleId || articleProp?.id || 1)
+  const article = articlesData[currentArticleId] || articlesData[1]
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(article.likes)
+  
+  // Reset states when article changes
+  const handleArticleChange = (newArticleId: number) => {
+    setCurrentArticleId(newArticleId)
+    setIsLiked(false)
+    setLikeCount(articlesData[newArticleId]?.likes || 0)
+  }
 
   const handleLike = () => {
     if (isLiked) {
@@ -303,6 +326,7 @@ export default function ArticleDetailPage({
               {article.relatedArticles.map((related) => (
                 <button
                   key={related.id}
+                  onClick={() => handleArticleChange(related.id)}
                   className="w-40 shrink-0 rounded-xl bg-card shadow-sm transition-transform active:scale-[0.98]"
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-xl">

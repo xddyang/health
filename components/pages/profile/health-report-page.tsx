@@ -14,6 +14,7 @@ import {
 
 interface HealthReportPageProps {
   onClose: () => void
+  onStartSkinTest?: () => void
 }
 
 const skinMetrics = [
@@ -54,7 +55,7 @@ const recommendations = [
   "保持充足睡眠，避免熬夜",
 ]
 
-export default function HealthReportPage({ onClose }: HealthReportPageProps) {
+export default function HealthReportPage({ onClose, onStartSkinTest }: HealthReportPageProps) {
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-background">
       {/* Header */}
