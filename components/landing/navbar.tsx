@@ -4,6 +4,7 @@ import { useState, useCallback } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Menu, X, Activity } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const navLinks = [
   { name: "首页", href: "#hero" },
@@ -63,6 +64,7 @@ export function Navbar() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
             <Button variant="ghost" size="sm">
               登录
             </Button>
@@ -96,6 +98,7 @@ export function Navbar() {
               </a>
             ))}
             <div className="pt-4 flex flex-col gap-2">
+              <ThemeToggle />
               <Button variant="ghost" className="justify-start">
                 登录
               </Button>
