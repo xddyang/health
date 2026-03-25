@@ -18,8 +18,8 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: '肤康 - 智能皮肤健康管家',
-  description: 'AI智能皮肤检测与问诊平台，专业皮肤科医生在线咨询，科普知识一站式服务',
+  title: '智康科技 - 用AI重新定义健康',
+  description: '智康科技致力于将前沿AI技术应用于健康医疗领域，打造智能化、个性化的健康管理解决方案',
   icons: {
     icon: [
       {
