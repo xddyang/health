@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Menu, X, Activity } from "lucide-react"
 
 const navLinks = [
-  { name: "首页", href: "#" },
+  { name: "首页", href: "#hero" },
   { name: "产品", href: "#products" },
   { name: "解决方案", href: "#solutions" },
   { name: "关于我们", href: "#about" },
@@ -15,6 +15,25 @@ const navLinks = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+
+  const handleSmoothScroll = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault()
+    const targetId = href.replace("#", "")
+    const element = document.getElementById(targetId)
+    
+    if (element) {
+      const navbarHeight = 64 // 导航栏高度
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY
+      const offsetPosition = elementPosition - navbarHeight
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      })
+    }
+    
+    setIsOpen(false)
+  }, [])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -31,13 +50,14 @@ export function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.name}
                 href={link.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={(e) => handleSmoothScroll(e, link.href)}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 cursor-pointer"
               >
                 {link.name}
-              </Link>
+              </a>
             ))}
           </div>
 
@@ -66,14 +86,14 @@ export function Navbar() {
         <div className="md:hidden bg-background border-b border-border">
           <div className="px-4 py-4 space-y-3">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.name}
                 href={link.href}
-                className="block py-2 text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleSmoothScroll(e, link.href)}
+                className="block py-2 text-muted-foreground hover:text-primary transition-colors duration-300 cursor-pointer"
               >
                 {link.name}
-              </Link>
+              </a>
             ))}
             <div className="pt-4 flex flex-col gap-2">
               <Button variant="ghost" className="justify-start">
