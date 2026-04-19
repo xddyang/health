@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef, useEffect, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { 
   Shield, 
@@ -43,53 +44,85 @@ const features = [
   },
 ]
 
+const stats = [
+  { value: "98%", label: "用户满意度" },
+  { value: "1000万+", label: "服务用户" },
+  { value: "50+", label: "合作医院" },
+  { value: "99.9%", label: "系统可用性" },
+]
+
 export function FeaturesSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.1 }
+    )
+    
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+    
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section id="solutions" className="py-24 lg:py-32 bg-secondary/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="solutions" ref={sectionRef} className="py-32 relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-secondary/30" />
+      <div className="absolute inset-0 noise-overlay" />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        {/* Stats Bar */}
+        <div className={`grid grid-cols-2 lg:grid-cols-4 gap-8 mb-24 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+          {stats.map((stat, index) => (
+            <div 
+              key={index} 
+              className="text-center"
+              style={{ transitionDelay: `${index * 100}ms` }}
+            >
+              <div className="text-4xl lg:text-5xl font-bold gradient-text mb-2">{stat.value}</div>
+              <div className="text-sm text-muted-foreground">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}
-          <div>
-            <Badge variant="secondary" className="mb-4">
+          <div className={`transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+            <Badge variant="outline" className="mb-6 px-4 py-1.5 text-xs uppercase tracking-widest">
               核心优势
             </Badge>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6 leading-tight">
               为什么选择
-              <span className="text-primary block">智康科技</span>
+              <span className="gradient-text block">睿肤云图</span>
             </h2>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-lg text-muted-foreground leading-relaxed">
               我们汇聚了顶尖的AI技术团队和医疗专家，致力于用科技推动医疗健康行业的数字化转型，让健康管理更智能、更便捷。
             </p>
-            
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6">
-              <div>
-                <div className="text-3xl lg:text-4xl font-bold text-primary mb-1">98%</div>
-                <div className="text-sm text-muted-foreground">用户满意度</div>
-              </div>
-              <div>
-                <div className="text-3xl lg:text-4xl font-bold text-primary mb-1">1000万+</div>
-                <div className="text-sm text-muted-foreground">服务用户</div>
-              </div>
-              <div>
-                <div className="text-3xl lg:text-4xl font-bold text-primary mb-1">50+</div>
-                <div className="text-sm text-muted-foreground">合作医院</div>
-              </div>
-            </div>
           </div>
 
           {/* Right Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="p-6 rounded-2xl bg-card border border-border hover:border-primary/50 transition-colors"
+                className={`group p-6 rounded-2xl bg-card border border-border hover:border-primary/30 card-hover transition-all duration-700 ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${300 + index * 100}ms` }}
               >
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <feature.icon className="w-5 h-5 text-primary" />
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors duration-300">
+                  <feature.icon className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>

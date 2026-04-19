@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef, useEffect, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle } from "lucide-react"
 
@@ -20,53 +21,92 @@ const values = [
 ]
 
 export function AboutSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.1 }
+    )
+    
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+    
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section id="about" className="py-24 lg:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16">
+    <section id="about" ref={sectionRef} className="py-32 relative">
+      {/* Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px]" />
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="grid lg:grid-cols-2 gap-20">
           {/* Left - Company Info */}
-          <div>
-            <Badge variant="secondary" className="mb-4">
+          <div className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+            <Badge variant="outline" className="mb-6 px-4 py-1.5 text-xs uppercase tracking-widest">
               关于我们
             </Badge>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-8 leading-tight">
               用AI技术
-              <span className="text-primary block">赋能健康未来</span>
+              <span className="gradient-text block">赋能健康未来</span>
             </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              睿肤云图成立于2026年，是一家专注于AI+健康医疗领域的科技创新企业。我们的团队由来自顶级科技公司和医疗机构的专家组成，致力于用人工智能技术解决医疗健康领域的痛点问题。
+            <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+              睿肤云图成立于2026年，是一家专注于AI+健康医疗领域的科技创新企业。我们的团队由来自顶级科技公司和医疗机构的专家组成。
             </p>
-            <p className="text-muted-foreground mb-8">
-              经过多年发展，我们已经形成了覆盖皮肤健康、智能问诊、健康监测、心理关怀、用药管理和慢病管理六大领域的产品矩阵，服务超过千万用户，与50多家医疗机构建立了深度合作。
+            <p className="text-muted-foreground mb-10 leading-relaxed">
+              经过多年发展，我们已经形成了覆盖皮肤健康、智能问诊、健康监测、心理关怀、用药管理和慢病管理六大领域的产品矩阵，服务超过千万用户。
             </p>
             
             {/* Values */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-foreground mb-4">我们的价值观</h3>
-              {values.map((value, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                  <span className="text-muted-foreground">{value}</span>
-                </div>
-              ))}
+            <div>
+              <h3 className="font-semibold text-foreground mb-6">我们的价值观</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {values.map((value, index) => (
+                  <div 
+                    key={index} 
+                    className={`flex items-center gap-3 p-4 rounded-xl bg-secondary/50 transition-all duration-700 ${
+                      isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+                    }`}
+                    style={{ transitionDelay: `${200 + index * 100}ms` }}
+                  >
+                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-sm text-foreground">{value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Right - Timeline */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-8 text-xl">发展历程</h3>
+          <div className={`transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+            <h3 className="font-semibold text-foreground mb-10 text-xl">发展历程</h3>
             <div className="relative">
               {/* Timeline line */}
-              <div className="absolute left-4 top-2 bottom-2 w-px bg-border" />
+              <div className="absolute left-[7px] top-2 bottom-2 w-[2px] bg-gradient-to-b from-primary via-primary/50 to-transparent" />
               
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {milestones.map((milestone, index) => (
-                  <div key={index} className="relative pl-12">
+                  <div 
+                    key={index} 
+                    className={`relative pl-10 transition-all duration-700 ${
+                      isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-5"
+                    }`}
+                    style={{ transitionDelay: `${400 + index * 100}ms` }}
+                  >
                     {/* Timeline dot */}
-                    <div className="absolute left-2 top-1.5 w-4 h-4 rounded-full bg-primary border-4 border-background" />
-                    <div className="p-4 rounded-xl bg-card border border-border">
-                      <div className="text-primary font-bold mb-1">{milestone.year}</div>
-                      <div className="text-muted-foreground text-sm">{milestone.event}</div>
+                    <div className="absolute left-0 top-3 w-4 h-4 rounded-full bg-primary/20 border-2 border-primary" />
+                    <div className="p-5 rounded-2xl bg-card border border-border card-hover">
+                      <div className="text-primary font-bold text-sm mb-1">{milestone.year}</div>
+                      <div className="text-foreground">{milestone.event}</div>
                     </div>
                   </div>
                 ))}
