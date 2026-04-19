@@ -27,7 +27,7 @@ export function HeroSection() {
 
           {/* Subheadline */}
           <p className="max-w-2xl mx-auto text-lg sm:text-xl text-muted-foreground mb-10 text-pretty">
-            智康科技致力于将前沿AI技术应用于健康医疗领域，打造智能化、个性化的健康管理解决方案，让每个人都能享受到科技带来的健康福祉。
+            睿肤云图致力于将前沿AI技术应用于健康医疗领域，打造智能化、个性化的健康管理解决方案，让每个人都能享受到科技带来的健康福祉。
           </p>
 
           {/* CTA Buttons */}

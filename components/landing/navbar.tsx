@@ -45,7 +45,7 @@ export function Navbar() {
             <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
               <Activity className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">智康科技</span>
+            <span className="text-xl font-bold text-foreground">睿肤云图</span>
           </Link>
 
           {/* Desktop Navigation */}

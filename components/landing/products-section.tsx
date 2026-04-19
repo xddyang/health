@@ -24,7 +24,7 @@ const products = [
   },
   {
     icon: MessageSquare,
-    title: "智康问诊",
+    title: "睿肤智诊",
     description: "AI驱动的智能问诊助手，7x24小时在线，快速预诊分诊，连接专业医生团队。",
     badge: "热门",
     features: ["智能预诊", "病症分析", "医生匹配"],

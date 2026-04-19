@@ -55,7 +55,7 @@ export function Footer() {
                 <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
                   <Activity className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="text-xl font-bold text-foreground">智康科技</span>
+                <span className="text-xl font-bold text-foreground">睿肤云图</span>
               </Link>
               <p className="text-sm text-muted-foreground mb-4">
                 用AI技术重新定义健康，让每个人都能享受科技带来的健康福祉。
@@ -99,7 +99,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="py-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2024 智康科技. 保留所有权利.
+            © 2026 睿肤云图. 保留所有权利.
           </p>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
             <Link href="#" className="hover:text-foreground transition-colors">隐私政策</Link>

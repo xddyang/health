@@ -21,8 +21,8 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: '智康科技 - 用AI重新定义健康',
-  description: '智康科技致力于将前沿AI技术应用于健康医疗领域，打造智能化、个性化的健康管理解决方案',
+  title: '睿肤云图 - 用AI重新定义健康',
+  description: '睿肤云图致力于将前沿AI技术应用于健康医疗领域，打造智能化、个性化的健康管理解决方案',
   icons: {
     icon: [
       {

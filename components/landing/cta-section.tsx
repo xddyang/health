@@ -21,7 +21,7 @@ export function CtaSection() {
                 之旅
               </h2>
               <p className="text-lg text-muted-foreground mb-10">
-                立即联系我们，了解智康科技如何为您的企业或个人提供定制化的AI健康解决方案。
+                立即联系我们，了解睿肤云图如何为您的企业或个人提供定制化的AI健康解决方案。
               </p>
               
               {/* Email Input */}
